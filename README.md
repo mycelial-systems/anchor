@@ -24,6 +24,7 @@ This has been adapted from [bryanbraun/anchorjs](https://github.com/bryanbraun/a
 - [Example](#example)
   * [API](#api)
   * [Pass in a query selector](#pass-in-a-query-selector)
+  * [Single-Page Application](#single-page-application)
 - [Modules](#modules)
   * [ESM](#esm)
   * [Common JS](#common-js)
@@ -77,6 +78,58 @@ import { anchor } from '@substrate-system/anchor'
 anchor(
   { visible: 'touch' },
   'h2:not(.no-anchor), h3:not(.no-anchor), h4:not(.no-anchor), h5:not(.no-anchor), h6:not(.no-anchor)')
+```
+
+### Single-Page Application
+
+Need to handle component lifecycle.
+
+```ts
+import { html } from 'htm/preact'
+import { type FunctionComponent } from 'preact'
+import { useEffect, useRef } from 'preact/hooks'
+import { anchor } from '@substrate-system/anchor'
+
+const MyView:FunctionComponent = function MyView () {
+  const containerRef = useRef<HTMLDivElement|null>(null)
+
+  /**
+   * Setup the anchor links
+   */
+  useEffect(() => {
+      if (!containerRef.current) return
+      const headings = containerRef.current.querySelectorAll('h2, h3')
+      anchor({ visible: 'hover', base: window.location.pathname }, headings)
+  }, [])
+
+  return html`<div ref=${containerRef}>${/* ... */}</div>`
+}
+```
+
+#### Route Events
+
+And need to handle hash links in your route change code.
+
+```ts
+function onRoute () {  // this is your application code
+  if (path.includes('#')) {
+      const pathParts = path.split('#')
+      const pathname = pathParts.shift()!.split('?').shift()!
+
+      if (pathname.split('/').filter(Boolean).length < 1) {
+          // we were given a hash link only, so scroll there
+          document.getElementById(pathParts.pop()!)?.scrollIntoView()
+          return
+      } else {
+          // URL has a path and also a hash, so set state, then scroll
+          state.route.value = stripTrailingSlash(pathname)
+          return setTimeout(() => {
+              // wait for veiw to render
+              document.getElementById(pathParts.pop()!)?.scrollIntoView()
+          }, 1)
+      }
+  }
+}
 ```
 
 ## Modules
