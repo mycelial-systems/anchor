@@ -92,6 +92,13 @@ test('skipped headings are not tracked', async t => {
     full.parentElement!.remove()
 })
 
+test('all done', () => {
+    if (window) {
+        // @ts-expect-error tests
+        window.testsFinished = true
+    }
+})
+
 function heading (html:string):HTMLElement {
     const container = document.createElement('div')
     container.innerHTML = html
