@@ -23,3 +23,31 @@ test('anchor function', async t => {
     t.ok(document.querySelector('a.example-class'),
         'should create an a tag with the class we passed in')
 })
+
+test('an empty heading does not throw', async t => {
+    const h = heading('<h2></h2>')
+    let err:unknown = null
+    try {
+        anchor({}, [h])
+    } catch (_err) {
+        err = _err
+    }
+    t.equal(err, null, 'add() should not throw on a childless heading')
+    h.parentElement!.remove()
+})
+
+test('adding twice does not duplicate the link', async t => {
+    const h = heading('<h2>Twice</h2>')
+    anchor({}, [h])
+    anchor({}, [h])
+    t.equal(h.querySelectorAll('.anchorjs-link').length, 1,
+        'a second add() should leave one link')
+    h.parentElement!.remove()
+})
+
+function heading (html:string):HTMLElement {
+    const container = document.createElement('div')
+    container.innerHTML = html
+    document.body.appendChild(container)
+    return container.firstElementChild as HTMLElement
+}

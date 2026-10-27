@@ -84,14 +84,14 @@ export class Anchor {
      * @return   {Boolean}     true/false
      */
     hasAnchorJSLink (el:HTMLElement):boolean {
-        const firstClass = (el.firstChild as HTMLElement).className
-        const lastClass = (el.lastChild as HTMLElement).className
-        const hasLeftAnchor = (el.firstChild &&
-            (' ' + firstClass + ' ').indexOf(' anchorjs-link ') > -1)
-        const hasRightAnchor = (el.lastChild &&
-            (' ' + lastClass + ' ').indexOf(' anchorjs-link ') > -1)
+        const first = el.firstChild as HTMLElement|null
+        const last = el.lastChild as HTMLElement|null
+        const hasLeftAnchor = Boolean(first &&
+            (' ' + first.className + ' ').indexOf(' anchorjs-link ') > -1)
+        const hasRightAnchor = Boolean(last &&
+            (' ' + last.className + ' ').indexOf(' anchorjs-link ') > -1)
 
-        return hasLeftAnchor || hasRightAnchor || false
+        return hasLeftAnchor || hasRightAnchor
     }
 
     /**
