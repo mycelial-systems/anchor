@@ -45,6 +45,53 @@ test('adding twice does not duplicate the link', async t => {
     h.parentElement!.remove()
 })
 
+test('a heading with no usable text gets no id or link', async t => {
+    const cases = [
+        '<h2></h2>',
+        '<h2>   </h2>',
+        '<h2>???</h2>',
+        '<h2><img alt=""></h2>'
+    ]
+    for (const html of cases) {
+        const h = heading(html)
+        anchor({}, [h])
+        t.ok(!h.hasAttribute('id'), `${html} should get no id`)
+        t.equal(h.querySelector('.anchorjs-link'), null,
+            `${html} should get no link`)
+        h.parentElement!.remove()
+    }
+})
+
+test('two empty headings in one call get no ids', async t => {
+    const a = heading('<h2></h2>')
+    const b = heading('<h2></h2>')
+    anchor({}, [a, b])
+    t.ok(!a.hasAttribute('id') && !b.hasAttribute('id'),
+        'neither empty heading should get an id')
+    a.parentElement!.remove()
+    b.parentElement!.remove()
+})
+
+test('an empty heading with an explicit id still gets a link', async t => {
+    const h = heading('<h2 id="explicit"></h2>')
+    anchor({}, [h])
+    const link = h.querySelector('a.anchorjs-link')
+    t.ok(link, 'should add a link')
+    t.ok(link?.getAttribute('href')?.endsWith('#explicit'),
+        'the link should point at the explicit id')
+    h.parentElement!.remove()
+})
+
+test('skipped headings are not tracked', async t => {
+    const empty = heading('<h2></h2>')
+    const full = heading('<h2>Tracked</h2>')
+    const a = anchor({}, [empty, full])
+    t.equal(a.els.length, 1, 'only one heading is tracked')
+    t.equal(a.els[0], full, 'the tracked heading is the one with text')
+    empty.parentElement!.remove()
+    full.parentElement!.remove()
+})
+
 function heading (html:string):HTMLElement {
     const container = document.createElement('div')
     container.innerHTML = html

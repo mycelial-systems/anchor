@@ -193,6 +193,12 @@ export class Anchor {
             } else {
                 tidyText = this.urlify(elements[i].textContent!)
 
+                // No usable text means no ID to link to, so leave it alone.
+                if (tidyText === '') {
+                    indexesToDrop.push(i)
+                    continue
+                }
+
                 // Compare our generated ID to existing IDs (and increment it
                 // if needed)
                 // before we add it to the page.
